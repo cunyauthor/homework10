@@ -1,0 +1,108 @@
+---
+title: "HW9"
+author: "Ka Man Chan"
+date: "November 6, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##  Introduction
+### For this project, start with a spam/ham dataset, then predict the class of new documents 
+
+```{r Sentiment_Analysis}
+
+list.of.packages <- c("tm","SnowballC","e1071","RTextTools")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+ 
+#load library
+library(SnowballC)
+library(tm)
+library(e1071)
+library(RTextTools)
+
+setwd("/Users/fionaho/Desktop/")
+
+#Remove cmds file
+if (file.exists("easy_ham/cmds")) file.remove("easy_ham/cmds")
+if (file.exists("spam/cmds")) file.remove("spam/cmds")
+
+#Create Corpus for Ham
+docs <- Corpus(DirSource('easy_ham'))
+
+#create the toSpace content transformer
+toSpace <- content_transformer(function(x, pattern) {return (gsub(pattern, " ", x))})
+docs <- tm_map(docs, toSpace, "-")
+docs <- tm_map(docs, toSpace, ":")
+
+#Remove punctuation – replace punctuation marks with ” “
+docs <- tm_map(docs, removePunctuation)
+docs <- tm_map(docs, toSpace, "’")
+docs <- tm_map(docs, toSpace, "‘")
+docs <- tm_map(docs, toSpace, " -")
+
+#Transform to lower case (need to wrap in content_transformer)
+docs <- tm_map(docs,content_transformer(tolower))
+#Strip digits (std transformation, so no need for content_transformer)
+docs <- tm_map(docs, removeNumbers)
+#remove stopwords using the standard list in tm
+docs <- tm_map(docs, removeWords, stopwords("english"))
+#Strip whitespace 
+docs <- tm_map(docs, stripWhitespace)
+#Stem document
+docs <- tm_map(docs,stemDocument)
+
+# Create Term Document Matrix
+tdm<-TermDocumentMatrix(docs)
+tdm
+dtm<-DocumentTermMatrix(docs)
+dtm
+
+# Start Check the Ham here 
+  ## Create Container
+  ## svm,tree,maxent_model <= Train Model
+  ## svm,tree,maxent_model <= classify Model
+# End Check the Ham here 
+
+#Create Corpus for Spam
+docs <- Corpus(DirSource('spam'))
+
+#create the toSpace content transformer
+toSpace <- content_transformer(function(x, pattern) {return (gsub(pattern, " ", x))})
+docs <- tm_map(docs, toSpace, "-")
+docs <- tm_map(docs, toSpace, ":")
+
+#Remove punctuation – replace punctuation marks with ” “
+docs <- tm_map(docs, removePunctuation,lazy=TRUE)
+docs <- tm_map(docs, toSpace, "’")
+docs <- tm_map(docs, toSpace, "‘")
+docs <- tm_map(docs, toSpace, " -")
+
+#Transform to lower case (need to wrap in content_transformer)
+docs <- tm_map(docs,content_transformer(tolower),lazy=TRUE)
+#Strip digits (std transformation, so no need for content_transformer)
+docs <- tm_map(docs, removeNumbers,lazy=TRUE)
+#remove stopwords using the standard list in tm
+docs <- tm_map(docs, removeWords, stopwords("english"),lazy=TRUE)
+#Strip whitespace 
+docs <- tm_map(docs, stripWhitespace,lazy=TRUE)
+#Stem document
+docs <- tm_map(docs,stemDocument,lazy=TRUE)
+# Create Term Document Matrix
+#tdm<-TermDocumentMatrix(docs,lazy=TRUE)
+#tdm
+#dtm<-DocumentTermMatrix(docs,lazy=TRUE)
+#dtm
+# Start Check the Spam here 
+  ## Create Container
+  ## svm,tree,maxent_model <= Train Model
+  ## svm,tree,maxent_model <= classify Model
+# End Check the Spam here 
+```
+
+##  Conclusion
+### predict the class of new documents 
+
